@@ -1,6 +1,7 @@
 import pygame, sys
 
 from options import *
+import Objects
 pygame.init()
 
 screen = pygame.display.set_mode(SIZE)
@@ -11,7 +12,7 @@ while True:
     screen.fill(BLACK)
 
 
-    pygame.draw.rect(screen, GREEN, [HEIGHT/2, WIDTH/2, BOX_SIZE, BOX_SIZE])
-
+    Area = Objects.Location(HEIGHT/2,WIDTH/2)
+    pygame.draw.rect(screen,Area.color,Area)
 
     pygame.display.flip()
