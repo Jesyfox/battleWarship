@@ -11,8 +11,12 @@ while True:
         if event.type == pygame.QUIT: sys.exit()
     screen.fill(BLACK)
 
+    #battle area drawing
+    Player_Area = Objects.draw_area(25, 25, 23, Objects.Location)
+    Enemy_Area = Objects.draw_area(25,350,23,Objects.Location)
 
-    Area = Objects.Location(HEIGHT/2,WIDTH/2)
-    pygame.draw.rect(screen,Area.color,Area)
+    for i in range(len(Player_Area)): #Fill with the color logic
+        pygame.draw.rect(screen,Player_Area[i].color,Player_Area[i])
+        pygame.draw.rect(screen,Enemy_Area[i].color,Enemy_Area[i])
 
     pygame.display.flip()
