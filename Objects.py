@@ -17,20 +17,23 @@ class Location(object):
     def get_pos(self):
     	return (self.x, self.y)
 
-    def place_ship(self, sections=1):
+    def place_ship(self):
         '''func that places a ship, duh'''
         if self.place_ability:
-            self.ship = Battle_ship(sections)
-
+            self.ship = Battle_ship(x=self.x, y=self.y,height=self.height, width=self.width, screen=self.screen)
+            
+            Battle_ship.sections -= 1
             self.health_status = True
-            self.ship_x = self.x+int(self.width/2)
-            self.ship_y = self.y+int(self.height/2)
             self.place_ability = False
 
     def refresh(self):
         '''func that makes logic'''
         if pygame.mouse.get_pressed()[0] and self.insice_loc():
-            self.place_ship()
+            #if its a placement state:
+            if self.state == "1":
+                self.place_ship()
+            #if its war stage:
+            #fire!
 
     def render(self):
         '''function that doing stuff with visualisation'''
@@ -44,7 +47,7 @@ class Location(object):
 
         if self.health_status:
         	# i will draw a ship
-        	pygame.draw.circle(self.screen, self.ship.color, (self.ship_x, self.ship_y), self.ship.radius)
+        	self.ship.draw()
 
     def insice_loc(self):
     	'''if inside the location:'''
@@ -53,14 +56,18 @@ class Location(object):
     	else:
     		return False
 
-
-
 class Battle_ship(object):
     '''class that contains ship data'''
-    def __init__(self,sections):
-        self.sections = sections
-        self.radius = 5
+    def __init__(self, x, y, height, width, screen):
+        self.radius = 7
         self.color = (100,100,0)
+        self.ship_x = x+int(width/2)
+        self.ship_y = y+int(height/2)
+        self.screen = screen
+
+    def draw(self):
+        pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
+
     
 
 def draw_area(horiz, vertic, step, obj, screen):
