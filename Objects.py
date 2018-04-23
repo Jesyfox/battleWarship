@@ -46,8 +46,8 @@ class Location(object):
         pygame.draw.rect(self.screen, self.color, [self.x, self.y, self.height, self.width])
 
         if self.health_status:
-        	# i will draw a ship
-        	self.ship.draw()
+            # i will draw a ship
+            self.ship.draw()
 
     def insice_loc(self):
     	'''if inside the location:'''
@@ -64,11 +64,22 @@ class Battle_ship(object):
         self.ship_x = x+int(width/2)
         self.ship_y = y+int(height/2)
         self.screen = screen
+        self.connect_Up = False
+        self.connect_Down = False	
+        self.connect_Left = False	
+        self.connect_Right = False
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
+        if self.connect_Up:
+            pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y-12, self.radius+1.5, self.radius+1.5])
+        if self.connect_Down:
+            pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y+3.5, self.radius+1.5, self.radius+1.5])
+        if self.connect_Right:
+            pygame.draw.rect(self.screen, self.color, [self.ship_x+3.5, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
+        if self.connect_Left:
+        	pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
 
-    
 
 def draw_area(horiz, vertic, step, obj, screen):
     """func draws area grid with starting coordinates"""
@@ -83,4 +94,3 @@ def draw_area(horiz, vertic, step, obj, screen):
         start_w = vertic
         start_h += step
     return Area
-
