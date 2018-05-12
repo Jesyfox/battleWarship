@@ -2,17 +2,23 @@ import pygame
 
 class Location(object):
     """Piece of battle area class
-    State 1: Placing time"""
+    State 1: Placement time"""
     def __init__(self, x, y, width, height, screen, state):
+        #location pos
         self.x = x
         self.y = y
+        #location size
         self.width = width
         self.height = height
+        #screen attachment
         self.screen = screen
+        #duh
         self.color = (10,10,120)
+        #ship placemanet
         self.health_status = False
-        self.state = state
         self.place_ability = True
+        #state of the game
+        self.state = state
 
     def get_pos(self):
     	return (self.x, self.y)
@@ -37,8 +43,6 @@ class Location(object):
 
     def render(self):
         '''function that doing stuff with visualisation'''
-        self.c_x, self.c_y = pygame.mouse.get_pos()
-
         if self.insice_loc():
             self.color = (150,0,0)
         else:
@@ -50,11 +54,12 @@ class Location(object):
             self.ship.draw()
 
     def insice_loc(self):
-    	'''if inside the location:'''
-    	if self.c_x >= (self.x) and self.c_x <= (self.x+self.width) and self.c_y >= self.y and self.c_y <= (self.y+self.height):
-    		return True
-    	else:
-    		return False
+        '''if inside the location:'''
+        self.c_x, self.c_y = pygame.mouse.get_pos()
+        if self.c_x >= (self.x) and self.c_x <= (self.x+self.width) and self.c_y >= self.y and self.c_y <= (self.y+self.height):
+            return True
+        else:
+            return False
 
 class Battle_ship(object):
     '''class that contains ship data'''
@@ -71,6 +76,8 @@ class Battle_ship(object):
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
+
+        #connections:
         if self.connect_Up:
             pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y-12, self.radius+1.5, self.radius+1.5])
         if self.connect_Down:
@@ -86,11 +93,13 @@ def draw_area(horiz, vertic, step, obj, screen):
     start_h = horiz
     start_w = vertic
     Area = []
+    Cols = []
     for i in range(0,10):
-        Area.append(obj(start_w, start_h, 20, 20, screen, "1"))
-        for j in range(0,10):
-            start_w += step
-            Area.append(obj(start_w, start_h, 20, 20, screen, "1"))
-        start_w = vertic
-        start_h += step
+        for i in range(0,10):
+            Cols.append(obj(start_w, start_h, 20, 20, screen, "1"))
+            start_h += step
+        Area.append(Cols)
+        Cols = []
+        start_h = horiz
+        start_w += step
     return Area
