@@ -5,3 +5,5 @@ BOX_SIZE = 30
 
 
 SECTIONS = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4] # ship count
+
+DEBUG = True

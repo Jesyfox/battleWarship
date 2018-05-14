@@ -17,11 +17,12 @@ class Location(object):
         #ship placemanet
         self.health_status = False
         self.place_ability = True
+        self.place_disability = False
         #state of the game
         self.state = state
 
     def get_pos(self):
-    	return (self.x, self.y)
+        return (self.x, self.y)
 
     def place_ship(self):
         '''func that places a ship, duh'''
@@ -53,8 +54,16 @@ class Location(object):
             # i will draw a ship
             self.ship.draw()
 
+        #draw place ability
+        if not self.health_status and self.place_ability:
+            pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
+
+        #draw place disability
+        if not self.health_status and self.place_disability:
+            pygame.draw.circle((self.screen, (150,0,0), (self.x+10,self.y+10), 3))
+
     def insice_loc(self):
-        '''if inside the location:'''
+        '''if cursor inside the location:'''
         self.c_x, self.c_y = pygame.mouse.get_pos()
         if self.c_x >= (self.x) and self.c_x <= (self.x+self.width) and self.c_y >= self.y and self.c_y <= (self.y+self.height):
             return True
@@ -66,15 +75,21 @@ class Battle_ship(object):
     def __init__(self, x, y, height, width, screen):
         self.radius = 7
         self.color = (100,100,0)
+        self.new_ship = True
+        #ship pos
         self.ship_x = x+int(width/2)
         self.ship_y = y+int(height/2)
+        #screen attachment
         self.screen = screen
+        #connections
         self.connect_Up = False
-        self.connect_Down = False	
-        self.connect_Left = False	
+        self.connect_Down = False   
+        self.connect_Left = False   
         self.connect_Right = False
 
     def draw(self):
+        if not self.new_ship:
+            self.color = (50,50,0)
         pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
 
         #connections:
@@ -85,7 +100,7 @@ class Battle_ship(object):
         if self.connect_Right:
             pygame.draw.rect(self.screen, self.color, [self.ship_x+3.5, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
         if self.connect_Left:
-        	pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
+            pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
 
 
 def draw_area(horiz, vertic, step, obj, screen):
