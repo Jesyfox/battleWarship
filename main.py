@@ -16,7 +16,7 @@ def Connect_ships():
 
     for j in Ten:
         for i in Ten:
-            if Player_Area[j][i].health_status:
+            if Player_Area[j][i].health_status and Player_Area[j][i].ship.new_ship:
                 ship_check = True
             #if left and right are neighbours - connect it
             if Player_Area[j][i].health_status and Player_Area[j-1][i].health_status:
@@ -33,7 +33,7 @@ def Connect_ships():
             if Player_Area[-1][i].health_status:Player_Area[-1][i].ship.connect_Right = False
     return ship_check
 
-def placeability():
+def placeability(Bool):
     '''func that makes every location with placeability - False
     except arount section of the ship
     or reversed
@@ -44,19 +44,26 @@ def placeability():
     #disable placeability in all area
     for Row in Ten:
         for Col in Ten:
-            Player_Area[Row][Col].place_ability = False
+            if not Player_Area[Row][Col].health_status:Player_Area[Row][Col].place_ability = Bool
 
     for Row in Ten:
         for Col in Ten:#if false, make placeability only around section of the ship
-            if Player_Area[Row][Col].health_status:
-                if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].place_ability = True #Left
-                if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].place_ability = True #Right
-                if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].place_ability = True #Up
-                if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].place_ability = True #Donw
-                #if not Player_Area[Row+1][Col+1].health_status:Player_Area[Row+1][Col+1].place_ability = True
-                #if not Player_Area[Row-1][Col-1].health_status:Player_Area[Row-1][Col-1].place_ability = True
-                #if not Player_Area[Row-1][Col+1].health_status:Player_Area[Row-1][Col+1].place_ability = True
-                #if not Player_Area[Row+1][Col-1].health_status:Player_Area[Row+1][Col-1].place_ability = True
+            if not Bool:
+                if Player_Area[Row][Col].health_status and Player_Area[Row][Col].ship.new_ship:
+                    if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].place_ability = not Bool #Left
+                    if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].place_ability = not Bool #Right
+                    if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].place_ability = not Bool #Up
+                    if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].place_ability = not Bool #Donw
+            else: #if True disables areas around ful ship
+                if Player_Area[Row][Col].health_status and not Player_Area[Row][Col].ship.new_ship:
+                    if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].place_ability = False #Left
+                    if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].place_ability = False #Right
+                    if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].place_ability = False #Up
+                    if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].place_ability = False #Donw
+                    if not Player_Area[Row+1][Col+1].health_status:Player_Area[Row+1][Col+1].place_ability = False
+                    if not Player_Area[Row-1][Col-1].health_status:Player_Area[Row-1][Col-1].place_ability = False
+                    if not Player_Area[Row-1][Col+1].health_status:Player_Area[Row-1][Col+1].place_ability = False
+                    if not Player_Area[Row+1][Col-1].health_status:Player_Area[Row+1][Col-1].place_ability = False
 
 def make_old():
     '''func that makes every ready ship  new_ship = False'''
@@ -80,6 +87,7 @@ def placement():
 
             #make ship not new:
             make_old()
+            placeability(True)
             
             
             if DEBUG:print('Ship number',ship_count,'with:',Objects.Battle_ship.sections,'sections')
@@ -105,7 +113,7 @@ while placement(): # place the ships state
     screen.fill(BLACK)
 
     if Connect_ships(): # if stating, you can only build on sides
-        placeability()
+        placeability(False)
 
     #battle area initial
     game_update()

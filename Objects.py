@@ -17,7 +17,6 @@ class Location(object):
         #ship placemanet
         self.health_status = False
         self.place_ability = True
-        self.place_disability = False
         #state of the game
         self.state = state
 
@@ -35,7 +34,8 @@ class Location(object):
 
     def refresh(self):
         '''func that makes logic'''
-        if pygame.mouse.get_pressed()[0] and self.insice_loc():
+
+        if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability:
             #if its a placement state:
             if self.state == "1":
                 self.place_ship()
@@ -59,8 +59,8 @@ class Location(object):
             pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
 
         #draw place disability
-        if not self.health_status and self.place_disability:
-            pygame.draw.circle((self.screen, (150,0,0), (self.x+10,self.y+10), 3))
+        if not self.health_status and not self.place_ability:
+            pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
     def insice_loc(self):
         '''if cursor inside the location:'''
