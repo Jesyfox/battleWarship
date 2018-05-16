@@ -19,6 +19,7 @@ class Location(object):
         self.place_ability = True
         #state of the game
         self.state = state
+        self.lock = False
 
     def get_pos(self):
         return (self.x, self.y)
@@ -34,6 +35,9 @@ class Location(object):
 
     def refresh(self):
         '''func that makes logic'''
+
+        if self.lock: #When True, you cant do stuff
+            self.place_ability = False
 
         if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability:
             #if its a placement state:
@@ -55,11 +59,11 @@ class Location(object):
             self.ship.draw()
 
         #draw place ability
-        if not self.health_status and self.place_ability:
+        if not self.health_status and self.place_ability: # Green circle
             pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
 
         #draw place disability
-        if not self.health_status and not self.place_ability:
+        if not self.health_status and not self.place_ability: # Red circle
             pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
     def insice_loc(self):

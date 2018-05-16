@@ -50,20 +50,54 @@ def placeability(Bool):
         for Col in Ten:#if false, make placeability only around section of the ship
             if not Bool:
                 if Player_Area[Row][Col].health_status and Player_Area[Row][Col].ship.new_ship:
-                    if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].place_ability = not Bool #Left
-                    if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].place_ability = not Bool #Right
-                    if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].place_ability = not Bool #Up
-                    if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].place_ability = not Bool #Donw
-            else: #if True disables areas around ful ship
+                    try:
+                        if not Row == 0:
+                            if not Player_Area[Row-1][Col].health_status and not Player_Area[Row-1][Col].lock:
+                                Player_Area[Row-1][Col].place_ability = not Bool #Left
+                        if not Row == 9:
+                            if not Player_Area[Row+1][Col].health_status and not Player_Area[Row+1][Col].lock:
+                                Player_Area[Row+1][Col].place_ability = not Bool #Right
+
+                        if not Player_Area[Row][Col-1].health_status and not Player_Area[Row][Col-1].lock:
+                            Player_Area[Row][Col-1].place_ability = not Bool #Up
+                        if not Player_Area[Row][Col+1].health_status and not Player_Area[Row][Col+1].lock:
+                            Player_Area[Row][Col+1].place_ability = not Bool #Donw
+                    except IndexError:
+                        pass
+            elif Bool: #if True disables areas around full ship
                 if Player_Area[Row][Col].health_status and not Player_Area[Row][Col].ship.new_ship:
-                    if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].place_ability = False #Left
-                    if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].place_ability = False #Right
-                    if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].place_ability = False #Up
-                    if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].place_ability = False #Donw
-                    if not Player_Area[Row+1][Col+1].health_status:Player_Area[Row+1][Col+1].place_ability = False
-                    if not Player_Area[Row-1][Col-1].health_status:Player_Area[Row-1][Col-1].place_ability = False
-                    if not Player_Area[Row-1][Col+1].health_status:Player_Area[Row-1][Col+1].place_ability = False
-                    if not Player_Area[Row+1][Col-1].health_status:Player_Area[Row+1][Col-1].place_ability = False
+                    try:
+                        if not Player_Area[Row-1][Col].health_status:Player_Area[Row-1][Col].lock = True
+                    except IndexError:
+                        pass #Left
+                    try:
+                        if not Player_Area[Row+1][Col].health_status:Player_Area[Row+1][Col].lock = True
+                    except IndexError:
+                        pass #Right
+                    try:
+                        if not Player_Area[Row][Col-1].health_status:Player_Area[Row][Col-1].lock = True
+                    except IndexError:
+                        pass #Up
+                    try:
+                        if not Player_Area[Row][Col+1].health_status:Player_Area[Row][Col+1].lock = True
+                    except IndexError:
+                        pass #Donw
+                    try:
+                        if not Player_Area[Row+1][Col+1].health_status:Player_Area[Row+1][Col+1].lock = True
+                    except IndexError:
+                        pass
+                    try:
+                        if not Player_Area[Row-1][Col-1].health_status:Player_Area[Row-1][Col-1].lock = True
+                    except IndexError:
+                        pass
+                    try:
+                        if not Player_Area[Row-1][Col+1].health_status:Player_Area[Row-1][Col+1].lock = True 
+                    except IndexError:
+                        pass
+                    try:
+                        if not Player_Area[Row+1][Col-1].health_status:Player_Area[Row+1][Col-1].lock = True 
+                    except IndexError:
+                        pass
 
 def make_old():
     '''func that makes every ready ship  new_ship = False'''
@@ -85,7 +119,7 @@ def placement():
             Objects.Battle_ship.sections = SECTIONS.pop(-1) #send count information to Ship class
             ship_count =+ 1
 
-            #make ship not new:
+            #make ship not new and lock areas around:
             make_old()
             placeability(True)
             
@@ -95,6 +129,7 @@ def placement():
 
         return True
     except IndexError: # when placement is done:
+        if DEBUG:print('End of Placement, SECTIONS:',SECTIONS)
         return False
 
 screen = pygame.display.set_mode(SIZE)
@@ -119,3 +154,5 @@ while placement(): # place the ships state
     game_update()
 
     pygame.display.flip()
+
+if DEBUG:print('End.')
