@@ -1,4 +1,5 @@
 import pygame
+from options import *
 
 class Location(object):
     """Piece of battle area class
@@ -106,6 +107,26 @@ class Battle_ship(object):
         if self.connect_Left:
             pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
 
+class Enem_Location(Location):
+    """docstring for Enem_Location"""
+    def __init__(self, x, y, width, height, screen, state):
+        super(Enem_Location, self).__init__(x, y, width, height, screen,state)
+
+    def refresh(self):
+        '''func that makes logic'''
+        if self.lock: #When True, you cant do stuff
+            self.place_ability = False
+
+        if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability:
+            #if its a placement state:
+            if self.state == "1":
+                #nothing to do
+                if DEBUG:print('ENEMY AREA IS PRESSED!')
+            #if its war stage:
+            #fire!
+        
+
+
 
 def draw_area(horiz, vertic, step, obj, screen):
     """func draws area grid with starting coordinates"""
@@ -122,3 +143,102 @@ def draw_area(horiz, vertic, step, obj, screen):
         start_h = horiz
         start_w += step
     return Area
+
+def Connect_ships(obj):
+    '''func that draws connections on ships'''
+    Ten = list(range(0,10))
+    ship_check = False
+
+    for j in Ten:
+        for i in Ten:
+            if obj[j][i].health_status and obj[j][i].ship.new_ship:
+                ship_check = True
+            #if left and right are neighbours - connect it
+            if obj[j][i].health_status and obj[j-1][i].health_status:
+                obj[j][i].ship.connect_Left = True
+                obj[j-1][i].ship.connect_Right = True
+            # if Up and Down are neighbours - connetct it
+            if obj[j][i].health_status and obj[j][i-1].health_status:
+                obj[j][i].ship.connect_Up = True
+                obj[j][i-1].ship.connect_Down = True
+            #disable side connections
+            if obj[0][i].health_status:obj[0][i].ship.connect_Left = False
+            if obj[i][0].health_status:obj[i][0].ship.connect_Up = False      
+            if obj[i][-1].health_status:obj[i][-1].ship.connect_Down = False
+            if obj[-1][i].health_status:obj[-1][i].ship.connect_Right = False
+    return ship_check
+
+def placeability(Bool,obj):
+    '''func that makes every location with placeability - False
+    except arount section of the ship
+    or reversed
+    When - True ----- Disable all plasing except fresh ship
+    When - False ---- Disable all, except left,right,up and down'''
+
+    Ten = list(range(0,10))
+
+    #disable placeability in all area
+    for Row in Ten:
+        for Col in Ten:
+            if not obj[Row][Col].health_status:obj[Row][Col].place_ability = Bool
+
+    for Row in Ten:
+        for Col in Ten:#if false, make placeability only around section of the ship
+            if not Bool:
+                if obj[Row][Col].health_status and obj[Row][Col].ship.new_ship:
+                    try:
+                        if not Row == 0:
+                            if not obj[Row-1][Col].health_status and not obj[Row-1][Col].lock:
+                                obj[Row-1][Col].place_ability = not Bool #Left
+                        if not Row == 9:
+                            if not obj[Row+1][Col].health_status and not obj[Row+1][Col].lock:
+                                obj[Row+1][Col].place_ability = not Bool #Right
+
+                        if not obj[Row][Col-1].health_status and not obj[Row][Col-1].lock:
+                            obj[Row][Col-1].place_ability = not Bool #Up
+                        if not obj[Row][Col+1].health_status and not obj[Row][Col+1].lock:
+                            obj[Row][Col+1].place_ability = not Bool #Donw
+                    except IndexError:
+                        pass
+            elif Bool: #if True disables areas around full ship
+                if obj[Row][Col].health_status and not obj[Row][Col].ship.new_ship:
+                    try:
+                        if not obj[Row-1][Col].health_status:obj[Row-1][Col].lock = True
+                    except IndexError:
+                        pass #Left
+                    try:
+                        if not obj[Row+1][Col].health_status:obj[Row+1][Col].lock = True
+                    except IndexError:
+                        pass #Right
+                    try:
+                        if not obj[Row][Col-1].health_status:obj[Row][Col-1].lock = True
+                    except IndexError:
+                        pass #Up
+                    try:
+                        if not obj[Row][Col+1].health_status:obj[Row][Col+1].lock = True
+                    except IndexError:
+                        pass #Donw
+                    try:
+                        if not obj[Row+1][Col+1].health_status:obj[Row+1][Col+1].lock = True
+                    except IndexError:
+                        pass
+                    try:
+                        if not obj[Row-1][Col-1].health_status:obj[Row-1][Col-1].lock = True
+                    except IndexError:
+                        pass
+                    try:
+                        if not obj[Row-1][Col+1].health_status:obj[Row-1][Col+1].lock = True 
+                    except IndexError:
+                        pass
+                    try:
+                        if not obj[Row+1][Col-1].health_status:obj[Row+1][Col-1].lock = True 
+                    except IndexError:
+                        pass
+
+def make_old(obj):
+    '''func that makes every ready ship  new_ship = False'''
+    Ten = list(range(0,10))
+    
+    for Row in Ten:
+        for Col in Ten:
+            if obj[Row][Col].health_status:obj[Row][Col].ship.new_ship = False
