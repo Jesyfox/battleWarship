@@ -157,7 +157,7 @@ def Connect_ships(obj):
             if obj[j][i].health_status and obj[j-1][i].health_status:
                 obj[j][i].ship.connect_Left = True
                 obj[j-1][i].ship.connect_Right = True
-            # if Up and Down are neighbours - connetct it
+            # if Up and Down are neighbours - connect it
             if obj[j][i].health_status and obj[j][i-1].health_status:
                 obj[j][i].ship.connect_Up = True
                 obj[j][i-1].ship.connect_Down = True
@@ -195,7 +195,10 @@ def placeability(Bool,obj):
                                 obj[Row+1][Col].place_ability = not Bool #Right
 
                         if not obj[Row][Col-1].health_status and not obj[Row][Col-1].lock:
-                            obj[Row][Col-1].place_ability = not Bool #Up
+                            if Col-1 < 0: # if index is [-1] pass it!
+                                pass
+                            else:
+                                obj[Row][Col-1].place_ability = not Bool #Up
                         if not obj[Row][Col+1].health_status and not obj[Row][Col+1].lock:
                             obj[Row][Col+1].place_ability = not Bool #Donw
                     except IndexError:
@@ -203,7 +206,10 @@ def placeability(Bool,obj):
             elif Bool: #if True disables areas around full ship
                 if obj[Row][Col].health_status and not obj[Row][Col].ship.new_ship:
                     try:
-                        if not obj[Row-1][Col].health_status:obj[Row-1][Col].lock = True
+                        if Row-1 < 0:
+                            pass
+                        else:
+                            if not obj[Row-1][Col].health_status:obj[Row-1][Col].lock = True
                     except IndexError:
                         pass #Left
                     try:
@@ -211,7 +217,10 @@ def placeability(Bool,obj):
                     except IndexError:
                         pass #Right
                     try:
-                        if not obj[Row][Col-1].health_status:obj[Row][Col-1].lock = True
+                        if Col-1 < 0:
+                            pass
+                        else:
+                            if not obj[Row][Col-1].health_status:obj[Row][Col-1].lock = True
                     except IndexError:
                         pass #Up
                     try:
@@ -221,19 +230,28 @@ def placeability(Bool,obj):
                     try:
                         if not obj[Row+1][Col+1].health_status:obj[Row+1][Col+1].lock = True
                     except IndexError:
-                        pass
+                        pass #Right Down
                     try:
-                        if not obj[Row-1][Col-1].health_status:obj[Row-1][Col-1].lock = True
+                        if Row-1 < 0 or Col-1 < 0:
+                            pass
+                        else:
+                            if not obj[Row-1][Col-1].health_status:obj[Row-1][Col-1].lock = True
                     except IndexError:
-                        pass
+                        pass #Up Left
                     try:
-                        if not obj[Row-1][Col+1].health_status:obj[Row-1][Col+1].lock = True 
+                        if Row-1 < 0:
+                            pass
+                        else:
+                            if not obj[Row-1][Col+1].health_status:obj[Row-1][Col+1].lock = True 
                     except IndexError:
-                        pass
+                        pass #Left Down
                     try:
-                        if not obj[Row+1][Col-1].health_status:obj[Row+1][Col-1].lock = True 
+                        if Col-1 < 0:
+                            pass
+                        else:
+                            if not obj[Row+1][Col-1].health_status:obj[Row+1][Col-1].lock = True 
                     except IndexError:
-                        pass
+                        pass #Left Up
 
 def make_old(obj):
     '''func that makes every ready ship  new_ship = False'''
@@ -242,3 +260,54 @@ def make_old(obj):
     for Row in Ten:
         for Col in Ten:
             if obj[Row][Col].health_status:obj[Row][Col].ship.new_ship = False
+
+def place_check(obj):
+    '''
+    func that checks place ability on areas, if he cant fing it, raises error
+    '''
+    Ten = list(range(0,10))
+    Place_list = []
+
+    for Row in Ten:
+        for Col in Ten:
+            if obj[Row][Col].place_ability:
+                Place_list.append(obj[Row][Col])
+            else:
+                pass
+
+    if Place_list == []:
+        return True
+    else:
+        return False
+
+
+def fix_defect(obj):
+    '''func detect not finished ship, deletes him and blocks defect places'''
+    Ten = list(range(0,10))
+
+    for Row in Ten:
+        for Col in Ten:
+            try:
+                if obj[Row][Col].ship.new_ship:
+                    obj[Row][Col].lock = True
+                    obj[Row][Col].health_status = False
+                    obj[Row][Col].placeability = False
+                else:
+                    pass
+            except AttributeError:
+                pass
+
+def ship_couner(obj):
+    '''func that count placed not finished new ships'''
+    Ten = list(range(0,10))
+    count = 0
+    for Row in Ten:
+        for Col in Ten:
+            try:
+                if obj[Row][Col].ship.new_ship:
+                    count += 1
+                else:
+                    pass
+            except AttributeError:
+                pass
+    return count
