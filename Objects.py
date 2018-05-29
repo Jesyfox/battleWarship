@@ -1,6 +1,8 @@
 import pygame
 from options import *
 
+loop_counter = 0
+
 class Location(object):
     """Piece of battle area class
     State 1: Placement time"""
@@ -41,11 +43,7 @@ class Location(object):
             self.place_ability = False
 
         if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability:
-            #if its a placement state:
-            if self.state == "1":
-                self.place_ship()
-            #if its war stage:
-            #fire!
+            self.click()
 
     def render(self):
         '''function that doing stuff with visualisation'''
@@ -74,6 +72,15 @@ class Location(object):
             return True
         else:
             return False
+
+    def click(self):
+        '''do stuff here if clicked'''
+        #if its a placement state:
+        if self.state == "1":
+            self.place_ship()
+        #if its war stage:
+        #fire!
+
 
 class Battle_ship(object):
     '''class that contains ship data'''
@@ -311,3 +318,39 @@ def ship_couner(obj):
             except AttributeError:
                 pass
     return count
+
+loop_counter = 0
+def Crack_check(obj):
+    '''func that find unbuildible places and block them'''
+    global loop_counter
+    if place_check(obj): # dont have space to build:
+        loop_counter += 1
+        if loop_counter == 5: #wait 5 ticks after detect, then do stuff:
+            if DEBUG:print('Unbuildible zone detect!\nRestart ship placing...')
+            fix_defect(obj) # close unbuildable zone
+            placeability(True, obj)# restart build a ship
+            Battle_ship.sections += ship_couner(obj) # restart secton counter
+            loop_counter = 0 #restart counter
+
+def placement(obj,sections_list):
+    '''func that count ships and sections
+    Works like bool element in While loop in build stage '''
+    try:
+        if Battle_ship.sections == 0: # new ship  
+            if DEBUG: print('start pop ship!')
+            Battle_ship.sections = sections_list.pop(-1) #send count information to Ship class
+            #so when i build a ship, class will know how many sections
+
+            #make ship done and lock areas around:
+            make_old(obj)
+
+            #new ship init
+            placeability(True, obj)            
+            
+            if DEBUG:print('Ship with:',Battle_ship.sections,'sections')
+            
+
+        return True
+    except IndexError: # when placement is done:
+        if DEBUG:print('End of Placement, SECTIONS:',sections_list)
+        return False
