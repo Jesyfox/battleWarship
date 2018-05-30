@@ -1,19 +1,33 @@
-def click(obj, heihgt, width):
-	'''
-	func that simulates mouse clicks in areas as Bot
-	works from BOT to TOP and LEFT to RIGHT!
+import random
 
-	Put only from 1 to 10 indexes for easy placement!
+def click(obj, cordinates):
+    '''
+    func that simulates mouse clicks in areas as Bot
+    '''
+    heihgt = cordinates[1]
+    width = cordinates[0]
 
-	'''
+    obj[width][heihgt].click()
 
-	if heihgt > 10 or width > 10:
-		raise ValueError('Put only from 1 to 10 indexes for easy placement!')
-	else:
-	    heihgt = 10 - heihgt #make height placemanet from botom to top
-	    if width != 0:
-		    width -= 1
-	    else:
-		    raise ValueError('Second index "<= 0"')
 
-	    obj[width][heihgt].click()
+def find_Wey(obj):
+    '''func that fount all true place_ability in area
+    and return list of tuple cordinates'''
+    Ten = list(range(0,10))
+    res = []
+
+    for Row in Ten:
+        for Col in Ten:
+            if obj[Row][Col].place_ability:
+                res.append((Row,Col))
+            else:
+                pass
+    return res
+
+
+def random_build(obj):
+    '''func that build ships randomly'''
+    the_wei = find_Wey(obj)
+    Build = random.choice(the_wei)
+    click(obj,Build)
+

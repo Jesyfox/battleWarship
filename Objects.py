@@ -348,9 +348,13 @@ def placement(obj,sections_list):
             placeability(True, obj)            
             
             if DEBUG:print('Ship with:',Battle_ship.sections,'sections')
+
+            if Battle_ship.sections == 0:
+                raise IndexError
             
 
         return True
     except IndexError: # when placement is done:
+        placeability(False, obj) #Lock all
         if DEBUG:print('End of Placement, SECTIONS:',sections_list)
         return False
