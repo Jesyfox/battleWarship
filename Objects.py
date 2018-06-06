@@ -58,11 +58,11 @@ class Location(object):
             self.ship.draw()
 
         #draw place ability
-        if not self.health_status and self.place_ability: # Green circle
+        if not self.health_status and self.place_ability and self.state is '1': # Green circle
             pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
 
         #draw place disability
-        if not self.health_status and not self.place_ability: # Red circle
+        if not self.health_status and not self.place_ability and self.state is '1': # Red circle
             pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
     def insice_loc(self):
@@ -76,10 +76,13 @@ class Location(object):
     def click(self):
         '''do stuff here if clicked'''
         #if its a placement state:
-        if self.state == "1":
+        if self.state is "1":
             self.place_ship()
-        #if its war stage:
-        #fire!
+        elif self.state is "2":
+            pass
+            #bot will do it another way
+    def get_shot():
+        pass
 
 
 class Battle_ship(object):
@@ -117,7 +120,7 @@ class Battle_ship(object):
 class Enem_Location(Location):
     """docstring for Enem_Location"""
     def __init__(self, x, y, width, height, screen, state):
-        super(Enem_Location, self).__init__(x, y, width, height, screen,state)
+        super(Enem_Location, self).__init__(x, y, width, height, screen, state)
 
     def refresh(self):
         '''func that makes logic'''
@@ -129,8 +132,29 @@ class Enem_Location(Location):
             if self.state == "1":
                 #nothing to do
                 if DEBUG:print('ENEMY AREA IS PRESSED!')
-            #if its war stage:
-            #fire!
+            if self.state == "2":
+                print('pew2')
+
+    def render(self):
+        '''function that doing stuff with visualisation'''
+        if self.insice_loc():
+            self.color = (150,0,0)
+        else:
+            self.color = (10,10,120)
+        pygame.draw.rect(self.screen, self.color, [self.x, self.y, self.height, self.width])
+
+        if DEBUG:
+            if self.health_status:
+                # i will draw a ship
+                self.ship.draw()
+
+            #draw place ability
+            if not self.health_status and self.place_ability and self.state is '1': # Green circle
+                pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
+
+            #draw place disability
+            if not self.health_status and not self.place_ability and self.state is '1': # Red circle
+                pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
         
 
 
@@ -143,7 +167,7 @@ def draw_area(horiz, vertic, step, obj, screen):
     Cols = []
     for i in range(0,10):
         for i in range(0,10):
-            Cols.append(obj(start_w, start_h, 20, 20, screen, "1"))
+            Cols.append(obj(start_w, start_h, 20, 20, screen, '1'))
             start_h += step
         Area.append(Cols)
         Cols = []
@@ -358,3 +382,13 @@ def placement(obj,sections_list):
         placeability(False, obj) #Lock all
         if DEBUG:print('End of Placement, SECTIONS:',sections_list)
         return False
+
+def battle_state(obj):
+    '''func that chane state in class'''
+    Ten = list(range(0,10))
+
+    for Row in Ten:
+        for Col in Ten:
+            obj[Row][Col].state = "2"
+            obj[Row][Col].lock = False
+            obj[Row][Col].place_ability = True
