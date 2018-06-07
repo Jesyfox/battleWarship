@@ -5,7 +5,8 @@ loop_counter = 0
 
 class Location(object):
     """Piece of battle area class
-    State 1: Placement time"""
+    State 1: Placement time
+    State 2: Battle time"""
     def __init__(self, x, y, width, height, screen, state):
         #location pos
         self.x = x
@@ -20,6 +21,8 @@ class Location(object):
         #ship placemanet
         self.health_status = False
         self.place_ability = True
+        #battle state variables
+        self.was_shot = False
         #state of the game
         self.state = state
         self.lock = False
@@ -42,7 +45,7 @@ class Location(object):
         if self.lock: #When True, you cant do stuff
             self.place_ability = False
 
-        if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability:
+        if pygame.mouse.get_pressed()[0] and self.insice_loc() and self.place_ability: #mouse logic
             self.click()
 
     def render(self):
@@ -65,6 +68,11 @@ class Location(object):
         if not self.health_status and not self.place_ability and self.state is '1': # Red circle
             pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
+        #draw 'X' if 'was_shot'
+        if self.was_shot:
+            pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
+            pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
+
     def insice_loc(self):
         '''if cursor inside the location:'''
         self.c_x, self.c_y = pygame.mouse.get_pos()
@@ -79,10 +87,20 @@ class Location(object):
         if self.state is "1":
             self.place_ship()
         elif self.state is "2":
-            pass
+            #self.get_shot()
             #bot will do it another way
-    def get_shot():
-        pass
+            pass
+
+    def get_shot(self):
+        '''
+        makes logic when this location is shot.
+        if location has a ship, destroy him.
+        makes location unshootable anymore.
+        '''
+        if not self.was_shot: # shoot location check
+            self.was_shot = True
+        else:
+            if DEBUG:print('nothin here!\ntry another location!')
 
 
 class Battle_ship(object):
@@ -133,7 +151,7 @@ class Enem_Location(Location):
                 #nothing to do
                 if DEBUG:print('ENEMY AREA IS PRESSED!')
             if self.state == "2":
-                print('pew2')
+                self.click()
 
     def render(self):
         '''function that doing stuff with visualisation'''
@@ -155,6 +173,20 @@ class Enem_Location(Location):
             #draw place disability
             if not self.health_status and not self.place_ability and self.state is '1': # Red circle
                 pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
+
+            #draw 'X' if 'was_shot'
+            if self.was_shot:
+                pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
+                pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
+
+
+    def click(self):
+        '''do stuff here if clicked'''
+        #if its a placement state:
+        if self.state is "1":
+            self.place_ship()
+        elif self.state is "2":
+            self.get_shot()
         
 
 
