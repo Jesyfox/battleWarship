@@ -27,7 +27,7 @@ def find_Wey(obj):
 
 def random_build(obj):
     '''func that build ships randomly'''
-    the_wei = find_Wey(obj)
-    Build = random.choice(the_wei)
+    the_wey = find_Wey(obj)
+    Build = random.choice(the_wey)
     click(obj,Build)
 

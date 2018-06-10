@@ -83,12 +83,17 @@ if DEBUG:print('End of placement')
 Objects.battle_state(Player_Area)
 Objects.battle_state(Enemy_Area)
 
-print(Player_Area[4][2].state)
+Turn = iter(Objects.switch())
 
-while True: # place the ships state
+while True: # battle state
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
     screen.fill(BLACK)
+    
+    if next(Turn):# then player
+        print('player')
+    else: # bot
+        print('bot')
 
     #battle area initial
     game_update(Player_Area)

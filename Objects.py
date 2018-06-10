@@ -8,6 +8,8 @@ class Location(object):
     State 1: Placement time
     State 2: Battle time"""
     def __init__(self, x, y, width, height, screen, state):
+
+        self.dont_hide = True       
         #location pos
         self.x = x
         self.y = y
@@ -58,7 +60,7 @@ class Location(object):
 
         if self.health_status:
             # i will draw a ship
-            self.ship.draw()
+            self.ship.draw(dont_hide=self.dont_hide)
 
         #draw place ability
         if not self.health_status and self.place_ability and self.state is '1': # Green circle
@@ -93,21 +95,26 @@ class Location(object):
 
     def get_shot(self):
         '''
-        makes logic when this location is shot.
+        makes logic when this location was shoted.
         if location has a ship, destroy him.
         makes location unshootable anymore.
         '''
         if not self.was_shot: # shoot location check
             self.was_shot = True
+            if self.health_status:
+                self.ship.destroy()
+
         else:
-            if DEBUG:print('nothin here!\ntry another location!')
+            #if DEBUG:print('nothin here!\ntry another location!')
+            pass
 
 
 class Battle_ship(object):
     '''class that contains ship data'''
     def __init__(self, x, y, height, width, screen):
+        self.alive = True
         self.radius = 7
-        self.color = (100,100,0)
+        self.color = (50,50,0)
         self.new_ship = True
         #ship pos
         self.ship_x = x+int(width/2)
@@ -120,25 +127,40 @@ class Battle_ship(object):
         self.connect_Left = False   
         self.connect_Right = False
 
-    def draw(self):
-        if not self.new_ship:
-            self.color = (50,50,0)
-        pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
+    def destroy(self):
+        '''
+        makes object dead(draw red circle)
+        '''
+        if DEBUG: print('DESTROY!')
+        self.alive = False
+        self.color = (200, 0, 0)
+        self.draw()
 
-        #connections:
-        if self.connect_Up:
-            pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y-12, self.radius+1.5, self.radius+1.5])
-        if self.connect_Down:
-            pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y+3.5, self.radius+1.5, self.radius+1.5])
-        if self.connect_Right:
-            pygame.draw.rect(self.screen, self.color, [self.ship_x+3.5, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
-        if self.connect_Left:
-            pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
+    def draw(self, dont_hide=False):
+        if dont_hide or not self.alive:
+            if not self.new_ship: #if its full builded ship color it
+                self.color = (50,50,0)
+            if not self.alive: # if was shoted color it:
+                self.color = (200,0,0)
+
+            pygame.draw.circle(self.screen, self.color, (self.ship_x, self.ship_y), self.radius)
+
+        if dont_hide:
+            #connections:
+            if self.connect_Up:
+                pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y-12, self.radius+1.5, self.radius+1.5])
+            if self.connect_Down:
+                pygame.draw.rect(self.screen, self.color, [self.ship_x-3.5, self.ship_y+3.5, self.radius+1.5, self.radius+1.5])
+            if self.connect_Right:
+                pygame.draw.rect(self.screen, self.color, [self.ship_x+3.5, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
+            if self.connect_Left:
+                pygame.draw.rect(self.screen, self.color, [self.ship_x-12, self.ship_y-3.5, self.radius+1.5, self.radius+1.5])
 
 class Enem_Location(Location):
     """docstring for Enem_Location"""
     def __init__(self, x, y, width, height, screen, state):
         super(Enem_Location, self).__init__(x, y, width, height, screen, state)
+        self.dont_hide = False
 
     def refresh(self):
         '''func that makes logic'''
@@ -161,11 +183,12 @@ class Enem_Location(Location):
             self.color = (10,10,120)
         pygame.draw.rect(self.screen, self.color, [self.x, self.y, self.height, self.width])
 
-        if DEBUG:
-            if self.health_status:
-                # i will draw a ship
-                self.ship.draw()
 
+        if self.health_status:
+            # i will draw a ship
+            self.ship.draw(dont_hide=self.dont_hide)
+
+        if self.dont_hide: #obj on enemy side
             #draw place ability
             if not self.health_status and self.place_ability and self.state is '1': # Green circle
                 pygame.draw.circle(self.screen, (0,150,0), (self.x+10,self.y+10), 3)
@@ -175,9 +198,9 @@ class Enem_Location(Location):
                 pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
             #draw 'X' if 'was_shot'
-            if self.was_shot:
-                pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
-                pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
+        if self.was_shot:
+            pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
+            pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
 
 
     def click(self):
@@ -188,7 +211,7 @@ class Enem_Location(Location):
         elif self.state is "2":
             self.get_shot()
         
-
+#-------------------------------------------funct----------------------------------------
 
 
 def draw_area(horiz, vertic, step, obj, screen):
@@ -214,7 +237,7 @@ def Connect_ships(obj):
 
     for j in Ten:
         for i in Ten:
-            if obj[j][i].health_status and obj[j][i].ship.new_ship:
+            if obj[j][i].health_status and obj[j][i].ship.new_ship: #location have a ship
                 ship_check = True
             #if left and right are neighbours - connect it
             if obj[j][i].health_status and obj[j-1][i].health_status:
@@ -395,7 +418,7 @@ def placement(obj,sections_list):
         if Battle_ship.sections == 0: # new ship  
             if DEBUG: print('start pop ship!')
             Battle_ship.sections = sections_list.pop(-1) #send count information to Ship class
-            #so when i build a ship, class will know how many sections
+            #so when i build a ship, class will know how many sections of it
 
             #make ship done and lock areas around:
             make_old(obj)
@@ -416,7 +439,7 @@ def placement(obj,sections_list):
         return False
 
 def battle_state(obj):
-    '''func that chane state in class'''
+    '''func that change state in class'''
     Ten = list(range(0,10))
 
     for Row in Ten:
@@ -424,3 +447,10 @@ def battle_state(obj):
             obj[Row][Col].state = "2"
             obj[Row][Col].lock = False
             obj[Row][Col].place_ability = True
+
+def switch():
+    '''return bool on call and reverse it'''
+    switch = True
+    while True:
+        switch = not switch
+        yield switch
