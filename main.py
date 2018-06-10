@@ -83,18 +83,24 @@ if DEBUG:print('End of placement')
 Objects.battle_state(Player_Area)
 Objects.battle_state(Enemy_Area)
 
-Turn = iter(Objects.switch())
+Turn = True
 
 while True: # battle state
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
     screen.fill(BLACK)
     
-    if next(Turn):# then player
-        print('player')
+    if Turn:# then player
+        if Objects.new_shot(Enemy_Area):
+            if DEBUG:print('Player:new shot detected!')
+            Objects.make_old_shot(Enemy_Area)
+            Turn = False
     else: # bot
-        print('bot')
+        if DEBUG:print('bot')
+        Bot.random_shot(Player_Area)
+        Turn = True
 
+    #Bot.random_shot(Player_Area)
     #battle area initial
     game_update(Player_Area)
     game_update(Enemy_Area)

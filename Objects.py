@@ -24,6 +24,7 @@ class Location(object):
         self.health_status = False
         self.place_ability = True
         #battle state variables
+        self.new_shot = False
         self.was_shot = False
         #state of the game
         self.state = state
@@ -71,7 +72,7 @@ class Location(object):
             pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
         #draw 'X' if 'was_shot'
-        if self.was_shot:
+        if self.was_shot or self.new_shot:
             pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
             pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
 
@@ -86,12 +87,13 @@ class Location(object):
     def click(self):
         '''do stuff here if clicked'''
         #if its a placement state:
-        if self.state is "1":
-            self.place_ship()
-        elif self.state is "2":
-            #self.get_shot()
-            #bot will do it another way
-            pass
+        if not self.lock:
+            if self.state is "1":
+                self.place_ship()
+            elif self.state is "2":
+                self.get_shot()
+                #bot will do it another way
+                pass
 
     def get_shot(self):
         '''
@@ -100,7 +102,7 @@ class Location(object):
         makes location unshootable anymore.
         '''
         if not self.was_shot: # shoot location check
-            self.was_shot = True
+            self.new_shot = True
             if self.health_status:
                 self.ship.destroy()
 
@@ -198,7 +200,7 @@ class Enem_Location(Location):
                 pygame.draw.circle(self.screen, (150,0,0), (self.x+10,self.y+10), 3)
 
             #draw 'X' if 'was_shot'
-        if self.was_shot:
+        if self.was_shot or self.new_shot:
             pygame.draw.line(self.screen, (150,150,150), (self.x, self.y), (self.x + self.width, self.y + self.height), 2)
             pygame.draw.line(self.screen, (150,150,150), (self.x + self.width, self.y), (self.x, self.y + self.height), 2)
 
@@ -454,3 +456,23 @@ def switch():
     while True:
         switch = not switch
         yield switch
+
+def make_old_shot(obj):
+    '''func that makes new shot, regular'''
+    Ten = list(range(0,10))
+    
+    for Row in Ten:
+        for Col in Ten:
+            if obj[Row][Col].new_shot:
+                obj[Row][Col].was_shot = True
+                obj[Row][Col].new_shot = False
+
+def new_shot(obj):
+    '''checks area for new shots'''
+    Ten = list(range(0,10))
+    
+    for Row in Ten:
+        for Col in Ten:
+            if obj[Row][Col].new_shot:
+                return True
+    return False

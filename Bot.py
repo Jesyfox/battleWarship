@@ -31,3 +31,22 @@ def random_build(obj):
     Build = random.choice(the_wey)
     click(obj,Build)
 
+def find_shot(obj):
+    '''find all shot posibilities in area(obj)'''
+    Ten = list(range(0,10))
+    res = []
+
+    for Row in Ten:
+        for Col in Ten:
+            if not obj[Row][Col].was_shot or not obj[Row][Col].new_shot:
+                res.append((Row,Col))
+            else:
+                pass
+    return res
+
+def random_shot(obj):
+    print('random shot')
+    '''func that shots randomly'''
+    the_wey = find_Wey(obj)
+    Build = random.choice(the_wey)
+    click(obj,Build)
